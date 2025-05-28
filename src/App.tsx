@@ -4,9 +4,13 @@ function App() {
 
   const BluetoothEnable = async () => {
     try {
-      // @ts-ignore
       const device = await navigator.bluetooth.requestDevice({
-        acceptAllDevices: true,
+        // acceptAllDevices: true,
+        filters: [
+          {
+            namePrefix: "Pixel"
+          }
+        ]
       })
       console.log("selected device:", device);
     } catch (error) {
