@@ -1,11 +1,24 @@
 import './App.css'
-import {useState} from "react";
+import {useRef, useState} from "react";
 
 function App() {
-  const [companyIdInputState, setCompanyIdInputState] = useState<string>("0xffff");
+  const companyIdInputRef = useRef<HTMLInputElement>(null);
+  const [warning, setWarning] = useState<string>("");
 
   const BluetoothEnable = async () => {
-    let companyIdInput = companyIdInputState;
+    if (companyIdInputRef.current === null) {
+        console.error("companyIdInputRef is null");
+        return;
+    }
+
+    if (!companyIdInputRef.current.checkValidity()){
+      setWarning("Company ID must be a valid hex value");
+      return;
+    }
+
+    setWarning("");
+
+    let companyIdInput = companyIdInputRef.current.value;
     if (!companyIdInput.startsWith("0x")) {
         companyIdInput = `0x${companyIdInput}`;
     }
@@ -36,11 +49,12 @@ function App() {
         <div id={"company-id-field"}>
           <label htmlFor={"company-id"}>Company ID</label>
           <input type={"text"} id={"company-id"} placeholder={"Company ID"} pattern={"(0x)?[0-9a-fA-F]{1,4}"}
-                 value={companyIdInputState}
-                 onChange={(e) => setCompanyIdInputState(e.target.value)}
+                    ref={companyIdInputRef}
           />
-
         </div>
+        {
+            warning && <p className={"error"}>{warning}</p>
+        }
         <button type={"button"} onClick={BluetoothEnable}>
           BL-enable
         </button>
